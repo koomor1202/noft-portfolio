@@ -666,14 +666,48 @@
       const isSp = window.innerWidth <= 767;
       const isPc = window.innerWidth >= 768;
       const show = window.scrollY > 220;
+      const footer = document.querySelector(".site-footer");
+      const footerNearViewport = footer ? footer.getBoundingClientRect().top <= window.innerHeight - 96 : false;
 
       pc.classList.toggle("is-visible", isPc && show);
-      sp.classList.toggle("is-visible", isSp && show);
+      sp.classList.toggle("is-visible", isSp && show && !footerNearViewport);
     }
 
     window.addEventListener("scroll", toggleCta, { passive: true });
     window.addEventListener("resize", toggleCta);
     toggleCta();
+  }
+
+
+  function setupAutoHideHeader() {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+
+    let lastY = window.scrollY;
+
+    function syncHeader() {
+      if (document.body.classList.contains("menu-open")) {
+        header.classList.remove("is-hidden");
+        lastY = window.scrollY;
+        return;
+      }
+
+      const currentY = window.scrollY;
+      const scrollingDown = currentY > lastY + 8;
+      const scrollingUp = currentY < lastY - 8;
+
+      if (currentY <= 80 || scrollingUp) {
+        header.classList.remove("is-hidden");
+      } else if (scrollingDown) {
+        header.classList.add("is-hidden");
+      }
+
+      lastY = currentY;
+    }
+
+    window.addEventListener("scroll", syncHeader, { passive: true });
+    window.addEventListener("resize", syncHeader);
+    syncHeader();
   }
 
   function renderBackToTop() {
@@ -707,6 +741,7 @@
   }
 
   syncActiveNav();
+  setupAutoHideHeader();
   setupMenu();
   setupCarousel();
   renderHomeWorks();

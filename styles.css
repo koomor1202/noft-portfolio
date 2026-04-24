@@ -1412,3 +1412,23 @@ iframe {
     gap: 20px;
   }
 }
+
+button,
+input,
+textarea {
+  color: inherit;
+}
+
+button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.site-header {
+  transition: transform 0.35s ease, background 0.25s ease, border-color 0.25s ease;
+  will-change: transform;
+}
+
+.site-header.is-hidden {
+  transform: translateY(calc(-100% - 1px));
+}
