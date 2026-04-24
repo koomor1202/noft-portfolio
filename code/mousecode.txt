@@ -1,0 +1,192 @@
+<style>
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor *:not(iframe) {
+    cursor: none !important;
+  }
+
+  iframe {
+    cursor: auto !important;
+  }
+
+  .studio-target-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+    z-index: 2147483647;
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0);
+    transition:
+      width 0.14s ease,
+      height 0.14s ease,
+      opacity 0.12s ease,
+      background-color 0.14s ease,
+      border-color 0.14s ease,
+      filter 0.14s ease,
+      box-shadow 0.14s ease;
+  }
+
+  .studio-target-cursor::before,
+  .studio-target-cursor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+  }
+
+  .studio-target-cursor::before {
+    border: 1.5px solid rgba(86, 102, 122, 0.74);
+    background: rgba(86, 102, 122, 0.08);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+  }
+
+  .studio-target-cursor::after {
+    inset: 7px;
+    background: rgba(86, 102, 122, 0.9);
+  }
+
+  .studio-target-cursor.is-visible {
+    opacity: 1;
+  }
+
+  .studio-target-cursor.is-hover {
+    width: 34px;
+    height: 34px;
+    filter:
+      drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.98))
+      drop-shadow(0 0 1.5px rgba(45, 62, 82, 0.35));
+  }
+
+  .studio-target-cursor.is-hover::before {
+    border: 2px solid rgba(226, 232, 240, 0.96);
+    box-shadow:
+      0 0 0 1px rgba(86, 102, 122, 0.72),
+      inset 0 0 0 1px rgba(86, 102, 122, 0.14);
+    background: rgba(226, 232, 240, 0.16);
+  }
+
+  .studio-target-cursor.is-hover::after {
+    inset: 9px;
+    background: rgba(51, 65, 85, 0.92);
+    box-shadow: 0 0 0 2px rgba(226, 232, 240, 0.92);
+  }
+
+  .studio-target-cursor.is-down {
+    width: 28px;
+    height: 28px;
+  }
+
+  .studio-target-cursor.is-down::before {
+    background: rgba(86, 102, 122, 0.14);
+  }
+
+  .studio-target-cursor.is-down::after {
+    background: rgba(51, 65, 85, 0.98);
+  }
+
+  .studio-target-cursor.is-hidden-on-iframe {
+    opacity: 0 !important;
+  }
+
+  @media (max-width: 767px), (pointer: coarse) {
+    html.has-custom-cursor,
+    html.has-custom-cursor body,
+    html.has-custom-cursor * {
+      cursor: auto !important;
+    }
+
+    .studio-target-cursor {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
+    const html = document.documentElement;
+    html.classList.add("has-custom-cursor");
+
+    const cursor = document.createElement("div");
+    cursor.className = "studio-target-cursor";
+    document.body.appendChild(cursor);
+
+    const hoverSelector = [
+      "a",
+      "button",
+      "[role='button']",
+      "input",
+      "textarea",
+      "select",
+      "summary",
+      "label",
+      "[data-hover-cursor]"
+    ].join(",");
+
+    function updateHover(target) {
+      const hoverable = target && target.closest ? target.closest(hoverSelector) : null;
+      cursor.classList.toggle("is-hover", !!hoverable);
+    }
+
+    function bindIframe(frame) {
+      if (!frame || frame.dataset.cursorBound === "true") return;
+
+      frame.dataset.cursorBound = "true";
+
+      frame.addEventListener("mouseenter", () => {
+        cursor.classList.remove("is-visible", "is-hover", "is-down");
+        cursor.classList.add("is-hidden-on-iframe");
+      });
+
+      frame.addEventListener("mouseleave", () => {
+        cursor.classList.remove("is-hidden-on-iframe");
+      });
+    }
+
+    window.addEventListener("pointermove", (event) => {
+      const target = event.target;
+      const isIframe = target && target.tagName === "IFRAME";
+
+      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+      cursor.classList.toggle("is-hidden-on-iframe", isIframe);
+      cursor.classList.toggle("is-visible", !isIframe);
+      updateHover(target);
+    }, { passive: true });
+
+    window.addEventListener("pointerdown", () => {
+      cursor.classList.add("is-down");
+    });
+
+    window.addEventListener("pointerup", () => {
+      cursor.classList.remove("is-down");
+    });
+
+    document.addEventListener("pointerleave", () => {
+      cursor.classList.remove("is-visible", "is-hidden-on-iframe");
+    });
+
+    window.addEventListener("blur", () => {
+      cursor.classList.remove("is-visible", "is-hidden-on-iframe");
+    });
+
+    document.querySelectorAll("iframe").forEach((frame) => {
+      bindIframe(frame);
+    });
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) return;
+          if (node.tagName === "IFRAME") bindIframe(node);
+          node.querySelectorAll?.("iframe").forEach((frame) => bindIframe(frame));
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  })();
+</script>
