@@ -48,6 +48,44 @@
     return "";
   }
 
+  function escapeHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char];
+    });
+  }
+
+  function sanitizeLinkUrl(value) {
+    if (!value) return "";
+
+    try {
+      const parsed = new URL(String(value), window.location.href);
+      return parsed.protocol === "http:" || parsed.protocol === "https:"
+        ? parsed.href
+        : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function sanitizeAssetUrl(value) {
+    if (!value) return "";
+
+    try {
+      const parsed = new URL(String(value), window.location.href);
+      return ["http:", "https:", "file:"].includes(parsed.protocol)
+        ? parsed.href
+        : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
   function normalizeCategorySlug(value) {
     const normalized = String(value || "").trim().toUpperCase();
     if (!normalized) return "";
@@ -245,10 +283,12 @@
   }
 
   function renderWorkCard(work) {
+    const safeTitle = escapeHtml(work.title);
+    const safeCover = sanitizeAssetUrl(work.cover);
     const pills = (work.categories || []).length
       ? `<div class="pill-row">${work.categories
           .map(function (category, index) {
-            return `<a class="pill pill--link" href="${getCategoryHref(work.categorySlugs[index])}">#${category}</a>`;
+            return `<a class="pill pill--link" href="${getCategoryHref(work.categorySlugs[index])}">#${escapeHtml(category)}</a>`;
           })
           .join("")}</div>`
       : "";
@@ -257,12 +297,12 @@
       <article class="work-card" data-categories="${(work.categorySlugs || []).join(" ")}" data-reveal>
         <a class="work-card__media-link" href="${getWorkDetailHref(work)}">
           <div class="work-card__media">
-            <img src="${work.cover}" alt="${work.title}">
+            <img src="${safeCover}" alt="${safeTitle}">
           </div>
         </a>
         <div class="work-card__content">
           <a class="work-card__title-link" href="${getWorkDetailHref(work)}">
-            <div class="work-card__title">${work.title}</div>
+            <div class="work-card__title">${safeTitle}</div>
           </a>
           ${pills}
         </div>
@@ -492,10 +532,11 @@
     if (!work) return;
 
     document.title = `${work.title} | NOFT DesignWorks`;
+    const safeTitle = escapeHtml(work.title);
 
     const categories = (work.categories || [])
       .map(function (category, index) {
-        return `<a class="pill pill--link" href="../index.html?category=${encodeURIComponent(work.categorySlugs[index])}">#${category}</a>`;
+        return `<a class="pill pill--link" href="../index.html?category=${encodeURIComponent(work.categorySlugs[index])}">#${escapeHtml(category)}</a>`;
       })
       .join("");
 
@@ -504,12 +545,15 @@
 
     const productionParts = [];
     if ((work.categories || []).length) {
-      productionParts.push(`制作種別: ${work.categories.join(" / ")}`);
+      productionParts.push(`制作種別: ${escapeHtml(work.categories.join(" / "))}`);
     }
     if (work.deliverables) {
-      productionParts.push(work.deliverables);
+      productionParts.push(escapeHtml(work.deliverables));
     }
     const productionBody = productionParts.join("<br>");
+    const safeSummary = escapeHtml(work.summary);
+    const safeApproach = escapeHtml(work.approach);
+    const safeSiteUrl = sanitizeLinkUrl(work.siteUrl);
 
     const websiteSection = hasWebsiteCategory(work)
       ? `
@@ -519,8 +563,8 @@
             <h2 class="detail-copy-block__title">PROJECT URL</h2>
           </div>
           ${
-            work.siteUrl
-              ? `<p class="detail-copy-block__body"><a class="text-link" href="${work.siteUrl}" target="_blank" rel="noopener noreferrer"><span>サイトを見る</span><span class="text-link__arrow"></span></a></p>`
+            safeSiteUrl
+              ? `<p class="detail-copy-block__body"><a class="text-link" href="${safeSiteUrl}" target="_blank" rel="noopener noreferrer"><span>サイトを見る</span><span class="text-link__arrow"></span></a></p>`
               : `<p class="detail-copy-block__body">この案件はWebサイト系の実績として掲載しています。公開可能なURLは準備中です。</p>`
           }
         </section>
@@ -531,7 +575,7 @@
       <article class="detail-layout">
         <div class="detail-intro" data-reveal>
           <div class="detail-heading__eyebrow">WORK DETAIL</div>
-          <h1 class="detail-heading__title">${work.title}</h1>
+          <h1 class="detail-heading__title">${safeTitle}</h1>
           <div class="pill-row">${categories}</div>
         </div>
 
@@ -545,7 +589,7 @@
                 .map(function (image, index) {
                   return `
                     <figure class="detail-gallery__slide">
-                      <img src="${image}" alt="${work.title} ${index + 1}">
+                      <img src="${sanitizeAssetUrl(image)}" alt="${safeTitle} ${index + 1}">
                     </figure>
                   `;
                 })
@@ -568,7 +612,7 @@
               <div class="detail-copy-block__label">概要</div>
               <h2 class="detail-copy-block__title">OVERVIEW</h2>
             </div>
-            <p class="detail-copy-block__body">${work.summary}</p>
+            <p class="detail-copy-block__body">${safeSummary}</p>
           </section>
 
           <section class="detail-copy-block" data-reveal>
@@ -576,7 +620,7 @@
               <div class="detail-copy-block__label">制作アプローチ</div>
               <h2 class="detail-copy-block__title">APPROACH</h2>
             </div>
-            <p class="detail-copy-block__body">${work.approach}</p>
+            <p class="detail-copy-block__body">${safeApproach}</p>
           </section>
 
           <section class="detail-copy-block" data-reveal>
