@@ -3,7 +3,8 @@ window.NOFT_DATA = {
     instagramUrl: "https://www.instagram.com/noft.designworks/",
     lineUrl: "https://lin.ee/6EH465r",
     contactUrl: "https://noft-designworks.com/contact",
-    estimateUrl: "https://estimate.noft-designworks.com/"
+    estimateUrl: "https://estimate.noft-designworks.com/",
+    worksApiUrl: "https://noft-microcms-proxy.koomor1202.workers.dev/api/works"
   },
   heroSlides: [
     {

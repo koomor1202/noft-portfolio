@@ -1,0 +1,8 @@
+{
+  "name": "noft-microcms-proxy",
+  "main": "./microcms-worker.js",
+  "compatibility_date": "2026-05-19",
+  "observability": {
+    "enabled": true
+  }
+}

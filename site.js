@@ -1,5 +1,10 @@
 (function () {
   const data = window.NOFT_DATA || {};
+  const categorySlugMap = new Map(
+    (data.categories || []).map(function (category) {
+      return [String(category.title || "").trim().toUpperCase(), category.slug];
+    })
+  );
 
   function getPage() {
     return document.body ? document.body.dataset.page || "" : "";
@@ -30,6 +35,114 @@
       url.searchParams.set(key, value);
     }
     window.history.replaceState({}, "", url);
+  }
+
+  function normalizeText(value) {
+    return typeof value === "string" ? value : "";
+  }
+
+  function normalizeImageUrl(value) {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    if (typeof value.url === "string") return value.url;
+    return "";
+  }
+
+  function normalizeCategorySlug(value) {
+    const normalized = String(value || "").trim().toUpperCase();
+    if (!normalized) return "";
+    return categorySlugMap.get(normalized) || normalized.toLowerCase().replace(/\s+/g, "");
+  }
+
+  function normalizeLegacyWork(work) {
+    const categories = Array.isArray(work.categories) ? work.categories : [];
+    const categorySlugs = Array.isArray(work.categorySlugs)
+      ? work.categorySlugs.filter(Boolean)
+      : categories.map(normalizeCategorySlug).filter(Boolean);
+
+    return {
+      title: normalizeText(work.title),
+      slug: normalizeText(work.slug),
+      cover: normalizeImageUrl(work.cover),
+      gallery: Array.isArray(work.gallery)
+        ? work.gallery.map(normalizeImageUrl).filter(Boolean)
+        : [],
+      categories: categories.map(function (category) {
+        return String(category);
+      }),
+      categorySlugs: categorySlugs,
+      summary: normalizeText(work.summary),
+      approach: normalizeText(work.approach),
+      deliverables: normalizeText(work.deliverables || work.production),
+      siteUrl: normalizeText(work.siteUrl),
+      sortOrder: Number(work.sortOrder || 0)
+    };
+  }
+
+  function normalizeMicrocmsWork(item) {
+    const categories = Array.isArray(item.categories) ? item.categories : [];
+
+    return {
+      title: normalizeText(item.title),
+      slug: normalizeText(item.slug || item.id),
+      cover: normalizeImageUrl(item.thumbnail),
+      gallery: Array.isArray(item.gallery)
+        ? item.gallery.map(normalizeImageUrl).filter(Boolean)
+        : [],
+      categories: categories.map(function (category) {
+        return String(category);
+      }),
+      categorySlugs: categories.map(normalizeCategorySlug).filter(Boolean),
+      summary: normalizeText(item.summary),
+      approach: normalizeText(item.approach),
+      deliverables: normalizeText(item.production),
+      siteUrl: normalizeText(item.siteUrl),
+      sortOrder: Number(item.sortOrder || 0)
+    };
+  }
+
+  async function hydrateWorks() {
+    const fallbackWorks = Array.isArray(data.works)
+      ? data.works.map(normalizeLegacyWork)
+      : [];
+
+    if (!data.site || !data.site.worksApiUrl) {
+      data.works = fallbackWorks;
+      return;
+    }
+
+    try {
+      const response = await fetch(data.site.worksApiUrl, {
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch works: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const contents = Array.isArray(payload.contents)
+        ? payload.contents
+        : Array.isArray(payload)
+          ? payload
+          : [];
+
+      const remoteWorks = contents
+        .map(normalizeMicrocmsWork)
+        .filter(function (work) {
+          return work.title && work.slug;
+        })
+        .sort(function (left, right) {
+          return (left.sortOrder || 0) - (right.sortOrder || 0);
+        });
+
+      data.works = remoteWorks.length ? remoteWorks : fallbackWorks;
+    } catch (error) {
+      console.warn("[NOFT] Falling back to local works data.", error);
+      data.works = fallbackWorks;
+    }
   }
 
   function getWorkBySlug(slug) {
@@ -740,20 +853,25 @@
     toggleBackToTop();
   }
 
-  syncActiveNav();
-  setupAutoHideHeader();
-  setupMenu();
-  setupCarousel();
-  renderHomeWorks();
-  renderAbout();
-  renderWorksPage();
-  renderContactPage();
-  renderEstimatePromo();
-  renderContactBands();
-  renderAboutSocials();
-  renderWorkDetailPage();
-  setupReveal();
-  setupCustomCursor();
-  renderFloatingCta();
-  renderBackToTop();
+  async function initialize() {
+    syncActiveNav();
+    setupAutoHideHeader();
+    setupMenu();
+    await hydrateWorks();
+    setupCarousel();
+    renderHomeWorks();
+    renderAbout();
+    renderWorksPage();
+    renderContactPage();
+    renderEstimatePromo();
+    renderContactBands();
+    renderAboutSocials();
+    renderWorkDetailPage();
+    setupReveal();
+    setupCustomCursor();
+    renderFloatingCta();
+    renderBackToTop();
+  }
+
+  initialize();
 })();
