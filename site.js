@@ -215,6 +215,37 @@
     return String(value).padStart(2, "0");
   }
 
+  function getHeroSlides() {
+    const worksSlides = Array.isArray(data.works)
+      ? data.works
+          .filter(function (work) {
+            return sanitizeAssetUrl(work.cover);
+          })
+          .slice(0, 5)
+          .map(function (work) {
+            return {
+              cover: sanitizeAssetUrl(work.cover),
+              title: normalizeText(work.title)
+            };
+          })
+      : [];
+
+    if (worksSlides.length) return worksSlides;
+
+    return Array.isArray(data.heroSlides)
+      ? data.heroSlides
+          .map(function (slide) {
+            return {
+              cover: sanitizeAssetUrl(slide.cover),
+              title: normalizeText(slide.title)
+            };
+          })
+          .filter(function (slide) {
+            return slide.cover;
+          })
+      : [];
+  }
+
   function getInstagramIcon() {
     return `
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -313,7 +344,7 @@
   function setupCarousel() {
     const track = document.querySelector("[data-hero-track]");
     const meta = document.querySelector("[data-hero-meta]");
-    const slides = data.heroSlides || [];
+    const slides = getHeroSlides();
 
     if (!track || !slides.length) return;
 
@@ -321,7 +352,7 @@
       .map(function (slide, index) {
         return `
           <figure class="hero-slide${index === 0 ? " is-active" : ""}" data-hero-slide>
-            <img class="hero-slide__image" src="${slide.cover}" alt="">
+            <img class="hero-slide__image" src="${slide.cover}" alt="${escapeHtml(slide.title || "")}">
           </figure>
         `;
       })
