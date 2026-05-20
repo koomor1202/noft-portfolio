@@ -8,13 +8,28 @@ window.NOFT_DATA = {
   },
   heroSlides: [
     {
-      cover: "https://storage.googleapis.com/studio-design-asset-files/projects/xmaZNx4baR/s-3325x2500_v-frms_webp_b6c1c8e7-741b-4920-b537-f63d47cc4d0f.png"
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/f1403b7eef48460b9602051464bb2918/%E3%83%8E%E3%82%B0%E3%83%81%E9%87%8D%E5%BB%BA%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BEhp_fv.png",
+      title: "ノグチ重建株式会社"
     },
     {
-      cover: "https://storage.googleapis.com/studio-design-asset-files/projects/xmaZNx4baR/s-4864x3328_v-frms_webp_d90f1b14-9035-465d-9315-7cd96c00566c.png"
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/9b5d41d873b845ae85ff37dca4ba0a9c/%E3%83%8E%E3%82%B0%E3%83%81_%E4%BC%9A%E7%A4%BE%E6%A6%82%E8%A6%81%E3%83%9A%E3%83%BC%E3%82%B81%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E7%9B%AE.png",
+      title: "ノグチ重建株式会社"
     },
     {
-      cover: "https://storage.googleapis.com/studio-design-asset-files/projects/xmaZNx4baR/s-4000x2250_v-frms_webp_2336928e-8e95-4c56-b9ae-b11884a2fba3.png"
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/c5e1f2d03e80456a9120a6fe9930e72f/%E3%83%8E%E3%82%B0%E3%83%81_%E4%BA%8B%E6%A5%AD%E4%B8%80%E8%A6%A7%E3%83%9A%E3%83%BC%E3%82%B8.png",
+      title: "ノグチ重建株式会社"
+    },
+    {
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/ad29ad81e33142febe4ea590ab70d02a/%E3%83%8E%E3%82%B0%E3%83%81_%E4%BA%8B%E6%A5%AD%E8%A9%B3%E7%B4%B0%E3%83%9A%E3%83%BC%E3%82%B8.png",
+      title: "ノグチ重建株式会社"
+    },
+    {
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/47a510915d7041e6ab7e8da7db138d69/%E3%83%8E%E3%82%B0%E3%83%81_%E3%83%95%E3%83%83%E3%82%BF%E3%83%BC%E6%8C%BF%E5%85%A5%E7%94%BB%E5%83%8F.png",
+      title: "ノグチ重建株式会社"
+    },
+    {
+      cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/aef9cad311c841539d8492005ec93c8c/%E3%83%8E%E3%82%B0%E3%83%81_%E3%83%95%E3%83%83%E3%82%BF%E3%83%BC.png",
+      title: "ノグチ重建株式会社"
     }
   ],
   categories: [

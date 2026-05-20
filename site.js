@@ -216,7 +216,22 @@
   }
 
   function getHeroSlides() {
-    const worksSlides = Array.isArray(data.works)
+    const fixedSlides = Array.isArray(data.heroSlides)
+      ? data.heroSlides
+          .map(function (slide) {
+            return {
+              cover: sanitizeAssetUrl(slide.cover),
+              title: normalizeText(slide.title)
+            };
+          })
+          .filter(function (slide) {
+            return slide.cover;
+          })
+      : [];
+
+    if (fixedSlides.length) return fixedSlides;
+
+    return Array.isArray(data.works)
       ? data.works
           .filter(function (work) {
             return sanitizeAssetUrl(work.cover);
@@ -227,21 +242,6 @@
               cover: sanitizeAssetUrl(work.cover),
               title: normalizeText(work.title)
             };
-          })
-      : [];
-
-    if (worksSlides.length) return worksSlides;
-
-    return Array.isArray(data.heroSlides)
-      ? data.heroSlides
-          .map(function (slide) {
-            return {
-              cover: sanitizeAssetUrl(slide.cover),
-              title: normalizeText(slide.title)
-            };
-          })
-          .filter(function (slide) {
-            return slide.cover;
           })
       : [];
   }
