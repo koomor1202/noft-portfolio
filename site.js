@@ -27,6 +27,12 @@
     return url.searchParams.get(key);
   }
 
+  function getCurrentWorkSlug() {
+    const querySlug = getQueryParam("slug");
+    if (querySlug) return querySlug;
+    return document.body ? document.body.dataset.workSlug || "" : "";
+  }
+
   function setQueryParam(key, value) {
     const url = new URL(window.location.href);
     if (!value || value === "all") {
@@ -196,6 +202,11 @@
   }
 
   function getWorkDetailHref(work) {
+    const staticSlugs = Array.isArray(data.staticWorkSlugs) ? data.staticWorkSlugs : [];
+    if (staticSlugs.includes(work.slug)) {
+      return toRoot(`works/${encodeURIComponent(work.slug)}/index.html`);
+    }
+
     const page = getPage();
     if (page === "home") return `./works/detail/index.html?slug=${encodeURIComponent(work.slug)}`;
     if (page === "works") return `./detail/index.html?slug=${encodeURIComponent(work.slug)}`;
@@ -486,7 +497,6 @@
       `;
     }
   }
-
   function renderEstimatePromo() {
     const mount = document.querySelector("[data-estimate-promo]");
     if (!mount) return;
@@ -501,7 +511,6 @@
       </a>
     `;
   }
-
   function renderContactBands() {
     document.querySelectorAll("[data-contact-band-actions]").forEach(function (mount) {
       mount.innerHTML = `
@@ -511,7 +520,6 @@
       `;
     });
   }
-
   function renderAboutSocials() {
     document.querySelectorAll("[data-about-social]").forEach(function (mount) {
       mount.innerHTML = `
@@ -558,13 +566,16 @@
     const mount = document.querySelector("[data-work-detail]");
     if (!mount) return;
 
-    const slug = getQueryParam("slug");
+    const slug = getCurrentWorkSlug();
     const work = getWorkBySlug(slug) || (data.works || [])[0];
     if (!work) return;
 
-    document.title = `${work.title} | NOFT DesignWorks`;
-    const safeTitle = escapeHtml(work.title);
+    document.title = `${work.title} | NOFT DesignWorks Portfolio`;
+    const description = (work.summary || "NOFT DesignWorksの制作実績詳細ページです。").trim();
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) metaDescription.setAttribute("content", description);
 
+    const safeTitle = escapeHtml(work.title);
     const categories = (work.categories || [])
       .map(function (category, index) {
         return `<a class="pill pill--link" href="../index.html?category=${encodeURIComponent(work.categorySlugs[index])}">#${escapeHtml(category)}</a>`;
@@ -676,7 +687,6 @@
 
     setupDetailGallery(mount);
   }
-
   function setupReveal() {
     const nodes = document.querySelectorAll("[data-reveal]");
     if (!nodes.length || !("IntersectionObserver" in window)) {

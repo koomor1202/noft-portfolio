@@ -1,0 +1,19 @@
+{
+  "name": "NOFT DesignWorks Portfolio",
+  "short_name": "NOFT Portfolio",
+  "description": "NOFT DesignWorksの制作実績とプロフィールをまとめたポートフォリオサイトです。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f7f4",
+  "theme_color": "#050505",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/assets/noft-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
