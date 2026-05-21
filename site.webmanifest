@@ -10,8 +10,8 @@
   "lang": "ja",
   "icons": [
     {
-      "src": "/assets/noft-logo.png",
-      "sizes": "512x512",
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     }
