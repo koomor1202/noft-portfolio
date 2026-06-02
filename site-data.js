@@ -6,7 +6,7 @@ window.NOFT_DATA = {
     estimateUrl: "https://estimate.noft-designworks.com/",
     worksApiUrl: "https://noft-microcms-proxy.koomor1202.workers.dev/api/works"
   },
-  staticWorkSlugs: ["noguchi-juken"],
+  staticWorkSlugs: ["noguchi-juken", "aoi-corporate-site"],
   heroSlides: [
     {
       cover: "https://images.microcms-assets.io/assets/9ab7eaac08984fdc87e05f780c4040ad/f1403b7eef48460b9602051464bb2918/%E3%83%8E%E3%82%B0%E3%83%81%E9%87%8D%E5%BB%BA%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BEhp_fv.png",
