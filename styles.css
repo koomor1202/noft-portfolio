@@ -855,7 +855,7 @@ svg * {
 
 .detail-gallery__slide img {
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .detail-gallery__arrow {
